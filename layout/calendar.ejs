@@ -1,0 +1,13 @@
+<section class="view view-calendar">
+  <div class="view-header bg-base-200 border-b border-base-300">
+    <div class="container view-header-inner">
+      <div class="calendar-controls" id="chunqiu-calendar-controls"></div>
+    </div>
+  </div>
+
+  <div class="view-body" id="chunqiu-calendar"></div>
+</section>
+
+<%- partial('_partial/events-data') %>
+
+<script defer src="<%= url_for('/js/chunqiu-calendar.js') %>"></script>

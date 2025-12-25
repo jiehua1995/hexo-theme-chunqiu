@@ -1,0 +1,70 @@
+<% 
+  const posts = page.posts && page.posts.toArray ? page.posts.toArray() : (page.posts || []);
+  const list = posts.slice();
+
+  const effectiveLang = (function () {
+    if (page && page.lang) return String(page.lang);
+    if (Array.isArray(config.language)) return String(config.language[0] || 'en');
+    return String(config.language || 'en');
+  })();
+
+  function getInt(value, fallback) {
+    if (value === 0) return 0;
+    if (!value) return fallback;
+    const n = Number(value);
+    return Number.isFinite(n) ? n : fallback;
+  }
+
+  function getMonthShort(month, lang) {
+    const m = getInt(month, 0);
+    if (m < 1 || m > 12) return '';
+    const raw = (lang || effectiveLang || 'en');
+    const l = (Array.isArray(raw) ? String(raw[0] || 'en') : String(raw)).toLowerCase();
+    if (l.startsWith('zh')) {
+      const zh = ['一月','二月','三月','四月','五月','六月','七月','八月','九月','十月','十一月','十二月'];
+      return zh[m - 1];
+    }
+    const isDe = l.startsWith('de');
+    const en = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+    const de = ['Jan','Feb','Mär','Apr','Mai','Jun','Jul','Aug','Sep','Okt','Nov','Dez'];
+    return (isDe ? de : en)[m - 1];
+  }
+%>
+
+<section class="hero">
+  <h1 class="hero__title"><%= page.title || 'Archives' %></h1>
+</section>
+
+<section class="chronicle" aria-label="Chronicle">
+  <div class="chronicle__header">
+    <div class="chronicle__col chronicle__col--year">Year</div>
+    <div class="chronicle__col chronicle__col--month">Mon</div>
+    <div class="chronicle__col chronicle__col--day">Day</div>
+    <div class="chronicle__col chronicle__col--title">Event</div>
+  </div>
+
+  <div class="chronicle__body">
+    <% if (!list.length) { %>
+      <div class="chronicle__empty">No posts.</div>
+    <% } %>
+
+    <% list.forEach(function(post){
+      const year = getInt(post.event_year, '');
+      const month = getMonthShort(post.event_month, effectiveLang);
+      const day = getInt(post.event_day, '');
+      const era = post.era ? String(post.era) : '';
+    %>
+      <article class="chronicle__row">
+        <div class="chronicle__cell chronicle__cell--year"><%= year %></div>
+        <div class="chronicle__cell chronicle__cell--month"><%= month %></div>
+        <div class="chronicle__cell chronicle__cell--day"><%= day %></div>
+        <div class="chronicle__cell chronicle__cell--title">
+          <a class="chronicle__link" href="<%= url_for(post.path) %>"><%= post.title %></a>
+          <% if (era) { %>
+            <span class="chronicle__meta"><%= era %></span>
+          <% } %>
+        </div>
+      </article>
+    <% }) %>
+  </div>
+</section>

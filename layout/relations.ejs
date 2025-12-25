@@ -1,0 +1,15 @@
+<section class="view view-relations">
+  <div class="view-body relations-body" id="chunqiu-relations">
+    <div class="relations-canvas">
+      <svg id="relations-svg" class="relations-svg" aria-label="Relations graph"></svg>
+    </div>
+    <div class="relations-panels">
+      <div class="panel" id="relations-legend"></div>
+      <div class="panel" id="relations-stats"></div>
+    </div>
+  </div>
+</section>
+
+<%- partial('_partial/events-data') %>
+
+<script defer src="<%= url_for('/js/chunqiu-relations.js') %>"></script>

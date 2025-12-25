@@ -1,0 +1,75 @@
+<%
+  // Embed events data for client-side views.
+  // This avoids runtime fetch failures (e.g. opening generated HTML via file://) and keeps the theme self-contained.
+
+  function toNum(v) {
+    if (v === 0) return 0;
+    if (v == null || v === '') return NaN;
+    const n = Number(v);
+    return Number.isFinite(n) ? n : NaN;
+  }
+
+  function normalizeRelations(raw) {
+    if (!raw) return [];
+    if (Array.isArray(raw)) {
+      return raw
+        .map((item) => {
+          if (!item) return null;
+          if (typeof item === 'string') return { to: String(item) };
+          if (typeof item === 'object') {
+            const to = item.to || item.id || item.slug || item.path;
+            if (!to) return null;
+            const out = { to: String(to) };
+            if (item.type) out.type = String(item.type);
+            return out;
+          }
+          return null;
+        })
+        .filter(Boolean);
+    }
+    if (typeof raw === 'string') return [{ to: String(raw) }];
+    return [];
+  }
+
+  const posts = site && site.posts && site.posts.toArray ? site.posts.toArray() : [];
+
+  const events = posts
+    .filter((post) => post && post.published !== false)
+    .map((post) => {
+      const source = post.source || '';
+      const id = String(
+        post.event_id ||
+        post.slug ||
+        source.replace(/\\/g, '/').replace(/^.*\//, '').replace(/\.md$/i, '') ||
+        post.path
+      );
+
+      return {
+        id,
+        title: post.title || '',
+        summary: post.summary || post.description || '',
+        path: post.path,
+        year: toNum(post.event_year),
+        month: toNum(post.event_month),
+        day: toNum(post.event_day),
+        era: post.era || '',
+        tags: (post.tags && post.tags.map) ? post.tags.map((t) => t.name) : [],
+        categories: (post.categories && post.categories.map) ? post.categories.map((c) => c.name) : [],
+        relations: normalizeRelations(post.relations),
+      };
+    })
+    .filter((e) => e.path && Number.isFinite(e.year) && Number.isFinite(e.month) && Number.isFinite(e.day))
+    .sort((a, b) => {
+      // Always sort from more recent to more ancient.
+      if (a.year !== b.year) return b.year - a.year;
+      if (a.month !== b.month) return b.month - a.month;
+      if (a.day !== b.day) return b.day - a.day;
+      return String(a.title).localeCompare(String(b.title), 'zh');
+    });
+
+  const safeJson = JSON.stringify(events).replace(/</g, '\\u003c');
+%>
+<script>
+  window.__CHUNQIU__ = window.__CHUNQIU__ || {};
+  window.__CHUNQIU__.events = <%- safeJson %>;
+</script>

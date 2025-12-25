@@ -1,0 +1,73 @@
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title><%= page.title ? page.title + ' | ' + config.title : config.title %></title>
+<% if (config.description) { %>
+<meta name="description" content="<%= config.description %>" />
+<% } %>
+<link rel="stylesheet" href="<%= url_for('/css/style.css') %>" />
+<% 
+	const themeLang = theme && (theme.build_language || theme.language);
+	const pageLang = themeLang || page.lang || (Array.isArray(config.language) ? config.language[0] : (config.language || 'en'));
+
+	function normalizeHexColor(v, fallback) {
+		const s = String(v || '').trim();
+		if (!s) return fallback;
+		if (/^#[0-9a-fA-F]{6}$/.test(s)) return s;
+		if (/^#[0-9a-fA-F]{3}$/.test(s)) {
+			return '#' + s[1] + s[1] + s[2] + s[2] + s[3] + s[3];
+		}
+		return fallback;
+	}
+
+	function hexToRgb(hex) {
+		const h = normalizeHexColor(hex, '#f0721a');
+		const n = parseInt(h.slice(1), 16);
+		const r = (n >> 16) & 255;
+		const g = (n >> 8) & 255;
+		const b = n & 255;
+		return { r, g, b };
+	}
+
+	const primary = normalizeHexColor(theme && theme.primary_color, '#f0721a');
+	const primaryHover = normalizeHexColor(theme && theme.primary_hover_color, '#e15810');
+	const rgb = hexToRgb(primary);
+%>
+<style>
+  :root {
+    --primary: <%= primary %>;
+    --primary-hover: <%= primaryHover %>;
+    --primary-rgb: <%= rgb.r %>, <%= rgb.g %>, <%= rgb.b %>;
+  }
+</style>
+<script>
+	window.__CHUNQIU__ = {
+		lang: "<%= pageLang %>",
+		root: "<%= config.root || '/' %>",
+		title: "<%= __('ui.title') %>",
+		texts: {
+			back: "<%= __('ui.back') %>",
+			viewCalendar: "<%= __('ui.viewCalendar') %>",
+			viewChronicle: "<%= __('ui.viewChronicle') %>",
+			view: "<%= __('ui.view') %>",
+			relations: "<%= __('ui.relations') %>",
+			tips: "<%= __('ui.tips') %>",
+			events: "<%= __('ui.events') %>",
+			thisYear: "<%= __('ui.thisYear') %>",
+			prevYear: "<%= __('ui.prevYear') %>",
+			nextYear: "<%= __('ui.nextYear') %>",
+			viewRelationGraph: "<%= __('ui.viewRelationGraph') %>",
+			relationsLegendTitle: "<%= __('ui.relationsLegendTitle') %>",
+			relationsLegendClick: "<%= __('ui.relationsLegendClick') %>",
+			relationsLegendDrag: "<%= __('ui.relationsLegendDrag') %>",
+			relationsLegendEdges: "<%= __('ui.relationsLegendEdges') %>",
+			relationsLegendChronicle: "<%= __('ui.relationsLegendChronicle') %>",
+			footer: "<%= __('ui.footer') %>",
+			eventCounter: "<%= __('ui.eventCounter') %>",
+			eventNavigation: "<%= __('ui.eventNavigation') %>",
+			previousEvent: "<%= __('ui.previousEvent') %>",
+			nextEvent: "<%= __('ui.nextEvent') %>",
+			relatedEvents: "<%= __('ui.relatedEvents') %>"
+		}
+	};
+</script>
+<script defer src="<%= url_for('/js/chunqiu-core.js') %>"></script>

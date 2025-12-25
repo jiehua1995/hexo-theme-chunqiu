@@ -1,0 +1,26 @@
+<% 
+  const isDetailPage = page.layout === 'post' || page.layout === 'page' && (page.path || '').startsWith('relations/');
+  const atCalendar = (page.path || '') === 'calendar/index.html' || (page.path || '').startsWith('calendar/');
+%>
+
+<header class="site-header">
+  <div class="container header-inner">
+    <div class="header-left">
+      <% if (isDetailPage) { %>
+        <button class="btn btn-outline btn-sm" type="button" onclick="history.back()"><%= __('ui.back') %></button>
+      <% } %>
+    </div>
+
+    <div class="header-center">
+      <a class="site-title" href="<%= url_for('/') %>"><%= __('ui.title') %></a>
+    </div>
+
+    <div class="header-right">
+      <% if (!isDetailPage) { %>
+        <a class="btn btn-outline btn-sm" href="<%= url_for(atCalendar ? '/' : '/calendar/') %>">
+          <%= atCalendar ? __('ui.viewChronicle') : __('ui.viewCalendar') %>
+        </a>
+      <% } %>
+    </div>
+  </div>
+</header>

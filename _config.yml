@@ -1,0 +1,25 @@
+# hexo-theme-chunqiu 主题配置
+
+# 单语言构建：指定生成站点所使用的语言。
+# 支持：zh-CN | zh-TW | en | de
+# 说明：主题会在构建期把 Hexo 的 config.language 设为该值，确保模板 i18n（__()）生效。
+build_language: en
+
+# 站点标题（不填则用 Hexo 的 site.title）
+# title: "春秋"
+
+# 首页显示数量（0 表示全部）
+home_limit: 0
+
+# 主题主色（用于按钮、强调色、关系图中心节点等）
+# 说明：建议用 6 位 hex 颜色（如 #f0721a）。
+primary_color: "#f0721a"
+
+# 主色 hover 状态（可选）
+primary_hover_color: "#e15810"
+
+# 是否显示标签
+show_tags: true
+
+# 是否显示 era 字段
+show_era: true

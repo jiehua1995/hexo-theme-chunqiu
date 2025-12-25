@@ -1,0 +1,90 @@
+<%
+  const year = page.event_year;
+  const month = page.event_month;
+  const day = page.event_day;
+  const era = page.era;
+  const source = String(page.source || '');
+  const basename = source.replace(/\\/g, '/').replace(/^.*\//, '').replace(/\.md$/i, '');
+  const eventId = String(page.event_id || page.slug || basename || page.path);
+  const summary = page.summary || page.description || '';
+
+  const prevPost = page.prev;
+  const nextPost = page.next;
+%>
+
+<div class="post-page">
+  <div class="post-container">
+    <section class="post-hero card border bg-base-200 shadow-md">
+      <div class="post-hero__inner">
+        <div class="post-hero__main">
+          <h1 class="post-hero__title"><%= page.title %></h1>
+          <div class="post-hero__date"><%= [year, month, day].filter(v => v !== undefined && v !== null && v !== '').join('-') %></div>
+          <% if (summary) { %>
+            <div class="post-hero__summary"><%= summary %></div>
+          <% } %>
+
+          <% if (page.tags && page.tags.length) { %>
+            <div class="post-hero__tags">
+              <% page.tags.forEach(function(t){ %>
+                <span class="badge badge-primary badge-ghost"><%= t.name %></span>
+              <% }) %>
+            </div>
+          <% } %>
+
+          <% if (era) { %>
+            <div class="post-hero__era">
+              <span class="badge badge-primary"><%= era %></span>
+            </div>
+          <% } %>
+        </div>
+      </div>
+    </section>
+
+    <section class="post-grid">
+      <div class="post-main">
+        <article class="post-article">
+          <div class="markdown">
+            <%- page.content %>
+          </div>
+        </article>
+        <div class="post-footer">
+          <a class="post__back" href="<%= url_for('/') %>">← <%= __('ui.viewChronicle') %></a>
+        </div>
+      </div>
+
+      <aside class="post-side">
+        <div class="panel post-panel">
+          <h3 class="panel-title"><%= __('ui.eventNavigation') %></h3>
+          <div class="post-nav">
+            <% if (prevPost) { %>
+              <a class="btn btn-ghost btn-sm post-nav__btn" href="<%= url_for(prevPost.path) %>"><%= __('ui.previousEvent') %>：<span class="post-nav__title"><%= prevPost.title %></span></a>
+            <% } %>
+            <% if (nextPost) { %>
+              <a class="btn btn-ghost btn-sm post-nav__btn" href="<%= url_for(nextPost.path) %>"><%= __('ui.nextEvent') %>：<span class="post-nav__title"><%= nextPost.title %></span></a>
+            <% } %>
+          </div>
+        </div>
+
+        <div class="panel post-panel">
+          <h3 class="panel-title"><%= __('ui.relatedEvents') %></h3>
+          <div id="chunqiu-related" class="post__related-list"></div>
+          <div class="post-related-actions">
+            <a class="btn btn-primary btn-sm" href="<%= url_for('/relations/') %>?event=<%= encodeURIComponent(eventId) %>"><%= __('ui.viewRelationGraph') %></a>
+          </div>
+
+          <div class="post-toc">
+            <div class="post-toc__title"><%= __('ui.toc') %></div>
+            <div id="chunqiu-toc" class="post-toc__list"></div>
+          </div>
+        </div>
+      </aside>
+    </section>
+  </div>
+</div>
+
+<%- partial('_partial/events-data') %>
+<script>
+  window.__CHUNQIU__ = window.__CHUNQIU__ || {};
+  window.__CHUNQIU__.currentEventId = "<%- eventId.replace(/</g, '\\u003c') %>";
+</script>
+<script defer src="<%= url_for('/js/chunqiu-post.js') %>"></script>
